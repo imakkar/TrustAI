@@ -3,6 +3,7 @@ import time
 import re
 from typing import List, Dict, Any, Optional
 import weaviate
+import weaviate.classes as wvc
 from langchain_openai import OpenAIEmbeddings, ChatOpenAI
 from langchain.prompts import PromptTemplate
 from langchain.chains import LLMChain
@@ -23,7 +24,7 @@ load_dotenv()
 class TrustAIRAGPipeline:
     def __init__(self):
         """Initialize the RAG pipeline with all necessary components."""
-        self.weaviate_url = os.getenv("WEAVIATE_URL", "localhost")
+        self.weaviate_url = os.getenv("WEAVIATE_URL")
         self.weaviate_api_key = os.getenv("WEAVIATE_API_KEY")
         self.openai_api_key = os.getenv("OPENAI_API_KEY")
         self.serpapi_key = os.getenv("SERPAPI_KEY")
@@ -51,62 +52,64 @@ class TrustAIRAGPipeline:
         self.research_synthesis_chain = self._create_research_synthesis_chain()
     
     def _initialize_weaviate_client(self):
-        """Initialize Weaviate v3 client."""
+        """Initialize Weaviate v4 client for cloud."""
         try:
-            if self.weaviate_api_key and self.weaviate_api_key != "":
-                auth_config = weaviate.AuthApiKey(api_key=self.weaviate_api_key)
-                client = weaviate.Client(
-                    url=f"https://{self.weaviate_url}",
-                    auth_client_secret=auth_config
-                )
-            else:
-                client = weaviate.Client(url="http://localhost:8080")
+            if not self.weaviate_url or not self.weaviate_api_key:
+                raise ValueError("WEAVIATE_URL and WEAVIATE_API_KEY environment variables are required")
+            
+            client = weaviate.connect_to_weaviate_cloud(
+                cluster_url=self.weaviate_url,
+                auth_credentials=wvc.init.Auth.api_key(self.weaviate_api_key)
+            )
             
             # Test connection
-            client.schema.get()
-            print("Weaviate client connected successfully")
-            return client
+            if client.is_ready():
+                print("Weaviate client connected successfully")
+                return client
+            else:
+                raise Exception("Weaviate client not ready")
+                
         except Exception as e:
             print(f"Failed to initialize Weaviate client: {e}")
             raise
     
     def _is_current_events_claim(self, claim: str) -> bool:
         """Determine if a claim needs current/recent information."""
-    # Time indicators
+        # Time indicators
         time_keywords = [
-        'current', 'currently', 'now', 'today', 'recent', 'latest', 'this year',
-        '2024', '2025', 'breaking', 'new', 'just announced'
+            'current', 'currently', 'now', 'today', 'recent', 'latest', 'this year',
+            '2024', '2025', 'breaking', 'new', 'just announced'
         ]
-    
-    # Topics that change frequently
+        
+        # Topics that change frequently
         dynamic_topics = [
-        # Politics & Government
-        'president', 'prime minister', 'election', 'government', 'congress',
-        'biden', 'trump', 'harris', 'administration', 'policy',
-        
-        # Business & Economy  
-        'ceo', 'stock price', 'company', 'merger', 'earnings', 'market',
-        
-        # Sports
-        'plays for', 'team', 'traded', 'signed', 'coach', 'season',
-        
-        # Technology
-        'released', 'launched', 'update', 'version', 'available',
-        
-        # Health/Medical (for ongoing research)
-        'treatment', 'vaccine', 'study shows', 'research finds',
-        
-        # Entertainment
-        'movie', 'show', 'album', 'tour', 'dating', 'married'
+            # Politics & Government
+            'president', 'prime minister', 'election', 'government', 'congress',
+            'biden', 'trump', 'harris', 'administration', 'policy',
+            
+            # Business & Economy  
+            'ceo', 'stock price', 'company', 'merger', 'earnings', 'market',
+            
+            # Sports
+            'plays for', 'team', 'traded', 'signed', 'coach', 'season',
+            
+            # Technology
+            'released', 'launched', 'update', 'version', 'available',
+            
+            # Health/Medical (for ongoing research)
+            'treatment', 'vaccine', 'study shows', 'research finds',
+            
+            # Entertainment
+            'movie', 'show', 'album', 'tour', 'dating', 'married'
         ]
-    
+        
         claim_lower = claim.lower()
-    
-    # Check for explicit time indicators
+        
+        # Check for explicit time indicators
         if any(keyword in claim_lower for keyword in time_keywords):
             return True
         
-    # Check for dynamic topics
+        # Check for dynamic topics
         if any(topic in claim_lower for topic in dynamic_topics):
             return True
         
@@ -187,50 +190,50 @@ class TrustAIRAGPipeline:
     def _generate_search_strategies(self, claim: str) -> List[Dict[str, str]]:
         """Generate universal search strategies for any topic like a professional fact-checking system."""
         strategies = []
-    
-    # Strategy 1: Primary Fact-Checking Sources (PolitiFact, Snopes, FactCheck.org)
+        
+        # Strategy 1: Primary Fact-Checking Sources (PolitiFact, Snopes, FactCheck.org)
         strategies.append({
-        'query': f'"{claim}" site:politifact.com OR site:snopes.com OR site:factcheck.org',
-        'type': 'primary_fact_checkers'
+            'query': f'"{claim}" site:politifact.com OR site:snopes.com OR site:factcheck.org',
+            'type': 'primary_fact_checkers'
         })
-    
-    # Strategy 2: Wikipedia + Encyclopedia Sources
+        
+        # Strategy 2: Wikipedia + Encyclopedia Sources
         strategies.append({
-        'query': f'"{claim}" site:wikipedia.org OR site:britannica.com',
-        'type': 'encyclopedia_sources'
+            'query': f'"{claim}" site:wikipedia.org OR site:britannica.com',
+            'type': 'encyclopedia_sources'
         })
-    
-    # Strategy 3: Academic and Scientific Sources
+        
+        # Strategy 3: Academic and Scientific Sources
         strategies.append({
-        'query': f'"{claim}" site:pubmed.ncbi.nlm.nih.gov OR site:scholar.google.com OR site:nature.com',
-        'type': 'academic_sources'
+            'query': f'"{claim}" site:pubmed.ncbi.nlm.nih.gov OR site:scholar.google.com OR site:nature.com',
+            'type': 'academic_sources'
         })
-    
-    # Strategy 4: Major News and Verification
+        
+        # Strategy 4: Major News and Verification
         strategies.append({
-        'query': f'"{claim}" site:reuters.com OR site:ap.org OR site:bbc.com verification',
-        'type': 'news_verification'
+            'query': f'"{claim}" site:reuters.com OR site:ap.org OR site:bbc.com verification',
+            'type': 'news_verification'
         })
-    
-    # Strategy 5: General Fact-Check Query
+        
+        # Strategy 5: General Fact-Check Query
         strategies.append({
-        'query': f'{claim} fact check verification truth debunked myth',
-        'type': 'general_fact_check'
+            'query': f'{claim} fact check verification truth debunked myth',
+            'type': 'general_fact_check'
         })
-    
-    # Strategy 6: Current Information (if time-sensitive)
+        
+        # Strategy 6: Current Information (if time-sensitive)
         if self._is_current_events_claim(claim):
             strategies.append({
-            'query': f'{claim} 2024 2025 current latest',
-            'type': 'current_information'
-        })
-    
-    # Strategy 7: Government/Official Sources (for certain topics)
+                'query': f'{claim} 2024 2025 current latest',
+                'type': 'current_information'
+            })
+        
+        # Strategy 7: Government/Official Sources (for certain topics)
         strategies.append({
-        'query': f'"{claim}" site:gov OR site:who.int OR site:cdc.gov',
-        'type': 'government_official'
+            'query': f'"{claim}" site:gov OR site:who.int OR site:cdc.gov',
+            'type': 'government_official'
         })
-    
+        
         return strategies
     
     def _score_source_reliability_serpapi(self, result: Dict) -> float:
@@ -475,29 +478,34 @@ EXPLANATION: [detailed explanation based on web results]"""
             processed_claim = preprocess_text(claim)
             embedding = self.embeddings.embed_query(processed_claim)
             
-            # Search similar claims in database
-            result = self.client.query.get("FactCheck", [
-                "claim", "verdict", "explanation", "source", "confidence_score"
-            ]).with_near_vector({
-                "vector": embedding
-            }).with_limit(self.max_retrieval_results).with_additional(["distance"]).do()
-            
-            similar_claims = []
-            if "data" in result and "Get" in result["data"] and "FactCheck" in result["data"]["Get"]:
-                for obj in result["data"]["Get"]["FactCheck"]:
-                    distance = obj["_additional"]["distance"]
+            # Search similar claims in database (updated for Weaviate v4)
+            try:
+                fact_check_collection = self.client.collections.get("FactCheck")
+                result = fact_check_collection.query.near_vector(
+                    near_vector=embedding,
+                    limit=self.max_retrieval_results,
+                    return_metadata=wvc.query.MetadataQuery(distance=True)
+                )
+                
+                similar_claims = []
+                for obj in result.objects:
+                    distance = obj.metadata.distance if obj.metadata.distance else 1.0
                     similarity = max(0, 1 - distance)
                     
                     if similarity >= self.similarity_threshold:
                         claim_data = {
-                            "claim": obj.get("claim", ""),
-                            "verdict": obj.get("verdict", ""),
-                            "explanation": obj.get("explanation", ""),
-                            "source": obj.get("source", ""),
-                            "confidence_score": obj.get("confidence_score", 0),
+                            "claim": obj.properties.get("claim", ""),
+                            "verdict": obj.properties.get("verdict", ""),
+                            "explanation": obj.properties.get("explanation", ""),
+                            "source": obj.properties.get("source", ""),
+                            "confidence_score": obj.properties.get("confidence_score", 0),
                             "similarity_score": similarity
                         }
                         similar_claims.append(claim_data)
+                        
+            except Exception as e:
+                print(f"Weaviate query failed: {e}")
+                similar_claims = []
             
             # Decide analysis approach
             llm_analysis = ""
@@ -579,4 +587,5 @@ EXPLANATION: [detailed explanation based on web results]"""
     
     def close(self):
         """Close the Weaviate client connection."""
-        pass
+        if hasattr(self.client, 'close'):
+            self.client.close()
