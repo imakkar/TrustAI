@@ -2,6 +2,7 @@ import streamlit as st
 import requests
 import json
 
+
 API_BASE_URL = "https://trustai-oquj.onrender.com"
 
 st.set_page_config(
@@ -48,7 +49,7 @@ def main():
         else:
             st.error("❌ API is not responding properly")
     except:
-        st.error("❌ Cannot connect to API. Make sure the backend is running on localhost:8000")
+        st.error("❌ Cannot connect to API. Make sure the backend is running.")
         st.stop()
     
     st.markdown("---")
@@ -191,11 +192,11 @@ def main():
     
     # Footer
     st.markdown("---")
-    st.markdown("""
+    st.markdown(f"""
     <div style='text-align: center; color: #666;'>
         <p>TrustAI v1.0.0 - Powered by OpenAI GPT-4 and Weaviate Vector Database</p>
-        <p>🔗 <a href="http://localhost:8000/docs" target="_blank">API Documentation</a> | 
-           🏥 <a href="http://localhost:8000/health" target="_blank">Health Check</a></p>
+        <p>🔗 <a href="{API_BASE_URL}/docs" target="_blank">API Documentation</a> | 
+           🏥 <a href="{API_BASE_URL}/health" target="_blank">Health Check</a></p>
     </div>
     """, unsafe_allow_html=True)
 
