@@ -1,0 +1,30 @@
+# Core FastAPI and web framework
+fastapi>=0.100.0
+uvicorn>=0.20.0
+python-multipart>=0.0.6
+pydantic>=2.0.0
+
+# RAG and AI components
+langchain>=0.1.0
+langchain-openai>=0.0.2
+openai>=1.6.1
+tiktoken>=0.5.2
+
+# Vector database
+weaviate-client>=4.0.0
+
+# Data processing
+pandas>=2.0.0
+numpy>=1.20.0
+requests>=2.30.0
+beautifulsoup4>=4.12.0
+
+# Environment and configuration
+python-dotenv>=1.0.0
+
+# Optional: For Streamlit frontend
+streamlit>=1.28.0
+
+# Testing and development
+pytest>=7.4.0
+httpx>=0.25.0

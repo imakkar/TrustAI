@@ -1,0 +1,52 @@
+[
+  {
+    "claim": "Vaccines cause autism in children",
+    "verdict": "False",
+    "explanation": "Multiple large-scale studies involving millions of children have found no link between vaccines and autism. The original study claiming this connection was fraudulent and has been retracted. The scientific consensus strongly supports vaccine safety.",
+    "source": "Medical Research",
+    "url": "https://example.com/vaccine-autism-debunked",
+    "date": "2023-05-15",
+    "category": "health",
+    "confidence_score": 95
+  },
+  {
+    "claim": "Climate change is a natural phenomenon and not caused by human activities",
+    "verdict": "False",
+    "explanation": "Scientific evidence overwhelmingly shows that current climate change is primarily caused by human activities, particularly greenhouse gas emissions from burning fossil fuels. The rate and pattern of warming matches human influence, not natural variability.",
+    "source": "Climate Science",
+    "url": "https://example.com/climate-change-human-caused",
+    "date": "2023-08-22",
+    "category": "science",
+    "confidence_score": 97
+  },
+  {
+    "claim": "The Great Wall of China is visible from space with the naked eye",
+    "verdict": "False",
+    "explanation": "This is a persistent myth. The Great Wall is not visible from space with the naked eye. NASA has confirmed that while some human-made structures can be seen from space, the Great Wall is not one of them due to its narrow width and similar coloring to surrounding terrain.",
+    "source": "Space Science",
+    "url": "https://example.com/great-wall-space-myth",
+    "date": "2023-03-10",
+    "category": "science",
+    "confidence_score": 92
+  },
+  {
+    "claim": "The Earth is flat",
+    "verdict": "False",
+    "explanation": "The Earth is an oblate spheroid, not flat. This has been proven through multiple methods including satellite imagery, physics experiments, astronomical observations, and direct measurement. The curvature of the Earth is observable and measurable.",
+    "source": "Earth Science",
+    "url": "https://example.com/earth-is-round",
+    "date": "2023-12-01",
+    "category": "science",
+    "confidence_score": 99
+  },
+  {
+    "claim": "You only use 10% of your brain",
+    "verdict": "False",
+    "explanation": "Neuroimaging studies show that we use virtually all of our brain, even during simple tasks. The 10% myth has no scientific basis. Different brain regions are active at different times, but over the course of a day, nearly 100% of the brain is used.",
+    "source": "Neuroscience",
+    "url": "https://example.com/brain-usage-myth",
+    "date": "2023-11-08",
+    "category": "science",
+    "confidence_score": 94
+  }
+]

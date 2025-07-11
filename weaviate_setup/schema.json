@@ -1,0 +1,63 @@
+{
+  "class": "FactCheck",
+  "description": "Fact-checked claims and statements from various sources",
+  "vectorizer": "none",
+  "properties": [
+    {
+      "name": "claim",
+      "dataType": [
+        "text"
+      ],
+      "description": "The original claim or statement being fact-checked"
+    },
+    {
+      "name": "verdict",
+      "dataType": [
+        "text"
+      ],
+      "description": "The fact-check verdict (True, False, Mostly True, Mostly False, Half True, Pants on Fire, etc.)"
+    },
+    {
+      "name": "explanation",
+      "dataType": [
+        "text"
+      ],
+      "description": "Detailed explanation of the fact-check analysis"
+    },
+    {
+      "name": "source",
+      "dataType": [
+        "text"
+      ],
+      "description": "Source of the fact-check (PolitiFact, Snopes, etc.)"
+    },
+    {
+      "name": "url",
+      "dataType": [
+        "text"
+      ],
+      "description": "URL to the original fact-check article"
+    },
+    {
+      "name": "date",
+      "dataType": [
+        "date"
+      ],
+      "description": "Date when the fact-check was published"
+    },
+    {
+      "name": "category",
+      "dataType": [
+        "text"
+      ],
+      "description": "Category of the claim (politics, health, science, etc.)"
+    },
+    {
+      "name": "confidence_score",
+      "dataType": [
+        "number"
+      ],
+      "description": "Confidence score of the fact-check (0-100)"
+    }
+  ]
+}
