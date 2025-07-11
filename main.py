@@ -6,7 +6,7 @@ import os
 import time
 from contextlib import asynccontextmanager
 from dotenv import load_dotenv
-from rag_pipeline import TrustAIRAGPipeline
+from .rag_pipeline import TrustAIRAGPipeline
 
 load_dotenv()
 

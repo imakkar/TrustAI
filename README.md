@@ -1,104 +1,155 @@
-# TrustAI - Misinformation Detection System
+# 🔍 TrustAI – Real-Time Misinformation Detection Engine
 
-🔍 **TrustAI** is a real-time misinformation detection system using RAG (Retrieval-Augmented Generation).
+**TrustAI** is an AI-powered web application that fact-checks user-submitted claims using a Retrieval-Augmented Generation (RAG) pipeline. It combines OpenAI GPT-4, Weaviate (vector database), and LangChain to deliver a trust score, confidence rating, and detailed explanation — all in real time.
 
-## 🚀 Quick Start
+> 🧠 Powered by GPT-4, LangChain, and Weaviate  
+> 🌐 Deployed via FastAPI (API) + Streamlit (UI)
 
-### 1. Get OpenAI API Key
-Get your API key from: https://platform.openai.com/api-keys
+---
 
-### 2. Edit .env file
-Open `.env` and replace `your_openai_api_key_here` with your actual key:
+## 🌐 Live Demo
+
+👉 [Launch TrustAI](https://your-streamlit-url.streamlit.app)  
+No sign-in required. Enter a claim and get instant analysis.
+
+---
+
+## 🧠 How It Works
+
+1. User submits a claim or article snippet.
+2. The system embeds the claim and queries Weaviate for similar fact-checked statements.
+3. GPT-4 compares results and generates:
+   - ✅ A **trust score** (0–100)
+   - ✅ A **confidence score**
+   - ✅ A natural language **explanation**
+   - ✅ Links to **similar claims**
+
+---
+
+## 💡 Key Features
+
+- 🔎 Real-time misinformation detection
+- 📊 Trust and confidence scores with color-coded feedback
+- 🧠 GPT-4 explanations and verdicts
+- 🔗 Vector similarity search with Weaviate
+- ⚙️ RESTful API (FastAPI) + optional frontend (Streamlit or React)
+- 🚀 Hosted and ready to demo
+
+---
+
+## 🧰 Tech Stack
+
+| Layer        | Technology |
+|--------------|------------|
+| LLM          | OpenAI GPT-4 |
+| RAG Pipeline | LangChain |
+| Vector DB    | Weaviate |
+| API Server   | FastAPI |
+| Frontend     | Streamlit (React optional) |
+| Deployment   | Railway (API) + Streamlit Cloud (UI) |
+| Data Sources | PolitiFact, Snopes, Wikipedia |
+
+---
+
+## 🧪 Local Development (for contributors)
+
+### 1. Clone this repo
+
+```bash
+git clone https://github.com/imakkar/TrustAI.git
+cd TrustAI
 ```
-OPENAI_API_KEY=sk-your-actual-key-here
+
+### 2. Set up environment variables
+
+Create a `.env` file in the root:
+
+```env
+OPENAI_API_KEY=your-openai-key
+SERPAPI_API_KEY=your-serpapi-key
 ```
 
-### 3. Install Dependencies
+> ⚠️ These keys are **not required** to use the public demo — only for local development.
+
+### 3. Install dependencies
+
 ```bash
 pip install -r requirements.txt
 ```
 
-### 4. Start Weaviate Database
+### 4. Start Weaviate locally
+
 ```bash
-docker run -d --name weaviate -p 8080:8080 -e AUTHENTICATION_ANONYMOUS_ACCESS_ENABLED=true semitechnologies/weaviate:1.23.7
+docker run -d --name weaviate -p 8080:8080   -e AUTHENTICATION_ANONYMOUS_ACCESS_ENABLED=true   semitechnologies/weaviate:1.23.7
 ```
 
-### 5. Ingest Sample Data
+### 5. Ingest fact-check dataset
+
 ```bash
 cd backend
 python ingest_data.py
 ```
 
-### 6. Start API Server
+### 6. Start the API
+
 ```bash
-cd backend
-python main.py
+uvicorn main:app --reload
 ```
 
-### 7. Run Frontend
-**Option A: Streamlit (Quick Demo)**
+### 7. Run the frontend (Streamlit)
+
 ```bash
-cd frontend
+cd ../frontend
 streamlit run app.py
 ```
-Open: http://localhost:8501
 
-**Option B: React Frontend**
-Use the App.jsx component in your React setup.
+Visit: [http://localhost:8501](http://localhost:8501)
 
-## 📊 API Usage
+---
 
-Test the API directly:
+## 📂 Project Structure
+
+```
+trustai/
+├── backend/           # FastAPI app + RAG pipeline
+├── frontend/          # Streamlit UI
+├── data/              # factbase.json
+├── weaviate_setup/    # Vector schema
+├── requirements.txt   # Dependencies
+├── .env               # API keys (excluded)
+└── README.md
+```
+
+---
+
+## 📡 API Endpoints
+
+| Method | Endpoint         | Description            |
+|--------|------------------|------------------------|
+| POST   | `/check_claim`   | Submit a claim for analysis |
+| GET    | `/health`        | API health check       |
+| GET    | `/docs`          | Swagger API docs       |
+
+Example:
 ```bash
-curl -X POST "http://localhost:8000/check_claim" \
+curl -X POST http://localhost:8000/check_claim \
   -H "Content-Type: application/json" \
   -d '{"claim": "Vaccines cause autism"}'
 ```
 
-## 🔧 Features
+---
 
-- ✅ Real-time fact-checking with 0-100 trust scores
-- ✅ Confidence ratings for assessment reliability
-- ✅ GPT-4 powered detailed explanations
-- ✅ Vector similarity search in fact-check database
-- ✅ Fast processing (<100ms for most queries)
-- ✅ RESTful API with comprehensive endpoints
-- ✅ Modern web interface options
+## 👨‍💻 Author
 
-## 📁 Project Structure
-
-```
-trustai/
-├── backend/           # FastAPI + RAG pipeline
-├── frontend/          # React + Streamlit options
-├── data/             # Sample fact-check database
-├── weaviate_setup/   # Vector DB schema
-├── requirements.txt  # Python dependencies
-├── .env             # Environment variables
-└── README.md        # This file
-```
-
-## 🆘 Troubleshooting
-
-**API not starting?**
-- Check your OpenAI API key in `.env`
-- Make sure Weaviate is running: `curl http://localhost:8080/v1/meta`
-
-**No similar claims found?**
-- Run the data ingestion: `cd backend && python ingest_data.py`
-
-**Connection errors?**
-- Verify backend is running on port 8000
-- Check firewall/antivirus isn't blocking connections
-
-## 📚 API Endpoints
-
-- `POST /check_claim` - Fact-check a claim
-- `GET /health` - System health check  
-- `GET /docs` - Interactive API documentation
-
-Visit http://localhost:8000/docs for full API documentation.
+Built by [Ishan Makkar](https://github.com/imakkar)  
+ML/AI + Product + Data | CS + DS @ Rutgers University
 
 ---
 
-🎉 **You now have a fully functional AI-powered misinformation detection system!**
+## 🪪 License
+
+MIT License – Free for personal and commercial use.
+
+---
+
+> ⭐️ If you find this project useful, please consider starring the repo on GitHub!
