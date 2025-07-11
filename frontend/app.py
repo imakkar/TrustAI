@@ -2,7 +2,7 @@ import streamlit as st
 import requests
 import json
 
-API_BASE_URL = "http://localhost:8000"
+API_BASE_URL = "https://trustai-oquj.onrender.com"
 
 st.set_page_config(
     page_title="TrustAI - Misinformation Detection",
