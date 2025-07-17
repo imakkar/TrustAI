@@ -9,7 +9,7 @@
 
 ## 🌐 Live Demo
 
-👉 [Launch TrustAI]([https://your-streamlit-url.streamlit.app](https://trust-ai-ishanmakkar.streamlit.app/))  
+👉 [Launch TrustAI](https://your-streamlit-url.streamlit.app](https://trust-ai-ishanmakkar.streamlit.app/))  
 No sign-in required. Enter a claim and get instant analysis.
 
 ---
